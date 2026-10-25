@@ -31,32 +31,22 @@ print(r.fromVersion, "->", r.toVersion, r.data)
 
 ## GIF 2 — Combat (`combat.gif`)
 
-1. Start a Play test. Walk to the three training dummies.
-2. Click four times in a row on one dummy. Show the four damage numbers. The gold number is the finisher with knockback.
-3. Swing at a dummy behind you. No damage appears: the server rejected the hit.
-4. Optional: in a second take, run an "exploit" from the client command bar to show it is blocked:
-
-```lua
-local r = game.ReplicatedStorage.Remotes.CombatRequest
-for i = 1, 200 do r:FireServer({ action = "Swing", aim = Vector3.new(0, 0, -1) }) end
-```
-
-Only a few swings land. The rate limiter and cooldown drop the rest.
+1. Start a Play test. Walk up close to the middle dummy.
+2. Start recording.
+3. Click **fast, about 3 clicks per second**, 4 times. The combo resets if you wait longer than 0.9 s.
+   You see a white slash and a white number on hits 1–3, then a gold slash, a big gold number and knockback on hit 4.
+4. Turn your back to the dummies and click once. The slash plays, but no damage appears: the server rejected the hit.
+5. Stop recording. Keep it under 10 seconds.
 
 ## GIF 3 — Idle economy (`economy.gif`)
 
-1. Start a Play test. Buy Lemonade Stands until the rate climbs.
-2. Switch the buy mode to `MAX` and buy again. Show the price change.
-3. To show offline earnings, first buy a few generators so your income is above 0.
-   Then click **Test → Toggle Server View** and run this in the command bar (**Window → Command Bar**).
-   It replays the join logic as if you had been away for 3 hours (Studio only):
-
-```lua
-game.Players:GetPlayers()[1]:SetAttribute("DebugOfflineSeconds", 3 * 3600)
-```
-
-   Click **Test → Toggle Server View** again to return to the player. The "Welcome back! You earned …" toast appears at the top.
-4. Run it again with `10 * 3600`. The toast now says "(8h cap)".
+1. Start a Play test.
+2. Start recording.
+3. Buy 3–4 Lemonade Stands. Watch the rate go up.
+4. Click **MAX**, then buy again.
+5. Press **O** (Studio only). A "Welcome back! You earned …" message shows for 7 seconds and the cash jumps.
+   Press **P** to replay 10 hours instead; the message ends with "(8h cap)".
+6. Stop recording. Keep it under 15 seconds.
 
 ## After recording
 
