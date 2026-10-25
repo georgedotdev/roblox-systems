@@ -55,6 +55,8 @@ The client fires `CombatRequest` with `{ action = "Swing", aim = Vector3 }`. Not
 
 ### Data: migrate, then reconcile
 
+![A legacy v0 save upgraded to v3 in Studio](docs/media/data.gif)
+
 `DataService` loads each player with ProfileStore, then runs `Migrations.run` **before**
 `Profile:Reconcile()`. If Reconcile ran first, it would stamp the current `Version` on old
 data and every migration step would be skipped.
