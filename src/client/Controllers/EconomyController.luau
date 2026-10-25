@@ -199,8 +199,9 @@ local function build()
 
 	local panel = Instance.new("Frame")
 	panel.Name = "Panel"
-	panel.AnchorPoint = Vector2.new(0, 0.5)
-	panel.Position = UDim2.new(0, 16, 0.5, 0)
+	-- Bottom-left, so Roblox's chat window (top-left) never covers the panel.
+	panel.AnchorPoint = Vector2.new(0, 1)
+	panel.Position = UDim2.new(0, 16, 1, -16)
 	panel.Size = UDim2.fromOffset(340, 0)
 	panel.AutomaticSize = Enum.AutomaticSize.Y
 	panel.BackgroundColor3 = PANEL
@@ -214,7 +215,9 @@ local function build()
 	local function fitToScreen()
 		local camera = workspace.CurrentCamera
 		local height = camera and camera.ViewportSize.Y or 720
-		scale.Scale = math.clamp(height / 820, 0.62, 1)
+		-- Keep about 210 px free at the top for the chat window.
+		-- The panel is about 600 px tall at full scale.
+		scale.Scale = math.clamp((height - 210) / 600, 0.5, 1)
 	end
 	fitToScreen()
 	workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(fitToScreen)
@@ -409,6 +412,8 @@ local function onNotice(notice: any)
 		toast("2x income boost active!", GOLD)
 	elseif notice.kind == "CannotAfford" then
 		toast("Not enough cash yet.")
+	elseif notice.kind == "NoOfflineIncome" then
+		toast("No offline earnings: your income is 0. Buy a generator first.")
 	end
 end
 

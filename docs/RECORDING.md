@@ -47,14 +47,15 @@ Only a few swings land. The rate limiter and cooldown drop the rest.
 
 1. Start a Play test. Buy Lemonade Stands until the rate climbs.
 2. Switch the buy mode to `MAX` and buy again. Show the price change.
-3. To show offline earnings, switch Studio to the **Server** view and run this in the command bar.
+3. To show offline earnings, first buy a few generators so your income is above 0.
+   Then click **Test → Toggle Server View** and run this in the command bar (**Window → Command Bar**).
    It replays the join logic as if you had been away for 3 hours (Studio only):
 
 ```lua
 game.Players:GetPlayers()[1]:SetAttribute("DebugOfflineSeconds", 3 * 3600)
 ```
 
-   Switch back to the **Client** view. The "Welcome back! You earned …" toast appears at the top.
+   Click **Test → Toggle Server View** again to return to the player. The "Welcome back! You earned …" toast appears at the top.
 4. Run it again with `10 * 3600`. The toast now says "(8h cap)".
 
 ## After recording

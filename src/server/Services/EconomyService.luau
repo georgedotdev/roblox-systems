@@ -226,6 +226,7 @@ end
 -- Studio-only test hook: set the attribute from the server command bar to
 -- replay offline earnings as if the player had been away that long:
 --   game.Players:GetPlayers()[1]:SetAttribute("DebugOfflineSeconds", 3600)
+-- The attribute is cleared after each use, so the same line can run again.
 local function attachDebugHook(player: Player)
 	if not RunService:IsStudio() then
 		return
@@ -234,6 +235,12 @@ local function attachDebugHook(player: Player)
 		local seconds = player:GetAttribute("DebugOfflineSeconds")
 		local data = DataService.getData(player)
 		if type(seconds) ~= "number" or seconds <= 0 or data == nil then
+			return
+		end
+		player:SetAttribute("DebugOfflineSeconds", nil)
+		if currentRate(data) <= 0 then
+			-- Offline earnings are a share of income; with no income there is nothing to pay.
+			notify(player, "NoOfflineIncome", {})
 			return
 		end
 		data.LastOnline = os.time() - seconds
