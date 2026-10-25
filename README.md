@@ -43,6 +43,8 @@ So the decisions run under Lune in CI, without Studio.
 
 ### Combat: the client asks, the server decides
 
+![A four-hit combo with a gold finisher on a training dummy](docs/media/combat.gif)
+
 The client fires `CombatRequest` with `{ action = "Swing", aim = Vector3 }`. Nothing else.
 `CombatService` then:
 
