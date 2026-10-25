@@ -12,6 +12,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local Economy = require(Shared.Economy.Economy)
@@ -106,7 +107,15 @@ local function displayedCash(): number
 	return state.cash + state.rate * (os.clock() - receivedAt)
 end
 
-local function toast(text: string, color: Color3?)
+local visibleToasts: { [string]: boolean } = {}
+
+local function toast(text: string, color: Color3?, seconds: number?)
+	-- Show each message once at a time; repeats while it is visible are dropped.
+	if visibleToasts[text] then
+		return
+	end
+	visibleToasts[text] = true
+
 	local frame = Instance.new("Frame")
 	frame.Size = UDim2.new(1, 0, 0, 44)
 	frame.BackgroundColor3 = PANEL
@@ -126,12 +135,13 @@ local function toast(text: string, color: Color3?)
 	local fadeIn = TweenInfo.new(0.25)
 	TweenService:Create(frame, fadeIn, { BackgroundTransparency = 0 }):Play()
 	TweenService:Create(l, fadeIn, { TextTransparency = 0 }):Play()
-	task.delay(4, function()
+	task.delay(seconds or 4, function()
 		local fadeOut = TweenInfo.new(0.4)
 		TweenService:Create(frame, fadeOut, { BackgroundTransparency = 1 }):Play()
 		TweenService:Create(l, fadeOut, { TextTransparency = 1 }):Play()
 		task.wait(0.45)
 		frame:Destroy()
+		visibleToasts[text] = nil
 	end)
 end
 
@@ -350,6 +360,18 @@ local function build()
 			price.TextColor3 = buy.TextColor3
 		end)
 		buy.Activated:Connect(function()
+			-- Check the price locally first. An unaffordable click flashes red and
+			-- sends nothing; the server still re-checks every purchase it receives.
+			local current = state
+			local owned = if current then current.generators[generator.Id] or 0 else 0
+			local cash = displayedCash()
+			local amount = amountFor(generator, owned, cash)
+			if amount <= 0 or Economy.costOf(generator, owned, amount) > cash then
+				local flash = TweenService:Create(row, TweenInfo.new(0.35), { BackgroundColor3 = ROW })
+				row.BackgroundColor3 = Color3.fromRGB(110, 40, 40)
+				flash:Play()
+				return
+			end
 			Remotes.get("EconomyPurchase"):FireServer({ generatorId = generator.Id, amount = buyMode })
 		end)
 
@@ -404,7 +426,8 @@ local function onNotice(notice: any)
 			`Welcome back! You earned ${NumberFormat.abbreviate(notice.earned)} in {NumberFormat.duration(
 				notice.seconds
 			)}{suffix}`,
-			ACCENT
+			ACCENT,
+			7
 		)
 	elseif notice.kind == "Prestiged" then
 		toast(`Prestiged! +{notice.gained} points ({notice.total} total)`, GOLD)
@@ -417,8 +440,27 @@ local function onNotice(notice: any)
 	end
 end
 
+-- Studio only: press O to replay 3 hours offline, P for 10 hours (shows the 8h cap).
+-- The server ignores this remote outside Studio.
+local function bindStudioDemoKeys()
+	if not RunService:IsStudio() then
+		return
+	end
+	UserInputService.InputBegan:Connect(function(input, gameProcessed)
+		if gameProcessed then
+			return
+		end
+		if input.KeyCode == Enum.KeyCode.O then
+			Remotes.get("DebugOffline"):FireServer(3 * 3600)
+		elseif input.KeyCode == Enum.KeyCode.P then
+			Remotes.get("DebugOffline"):FireServer(10 * 3600)
+		end
+	end)
+end
+
 function EconomyController.Start()
 	build()
+	bindStudioDemoKeys()
 	Remotes.get("EconomyState").OnClientEvent:Connect(onState)
 	Remotes.get("EconomyNotice").OnClientEvent:Connect(onNotice)
 

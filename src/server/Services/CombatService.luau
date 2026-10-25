@@ -169,6 +169,9 @@ local function onCombatRequest(player: Player, payload: any)
 
 	Remotes.get("CombatEffect"):FireAllClients({
 		attacker = character,
+		facing = Vector3.new(facing.X, 0, facing.Z),
+		range = weapon.Range,
+		arc = weapon.ArcDegrees,
 		comboIndex = swing.comboIndex,
 		isFinisher = swing.isFinisher,
 		hits = hitReports,

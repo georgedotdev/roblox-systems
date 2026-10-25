@@ -21,6 +21,9 @@ local DEFINITIONS: { [string]: "RemoteEvent" | "UnreliableRemoteEvent" } = {
 	EconomyPrestige = "RemoteEvent", -- client -> server: {}
 	EconomyState = "UnreliableRemoteEvent", -- server -> client: full state, about once per second
 	EconomyNotice = "RemoteEvent", -- server -> client: one-off messages (welcome back, errors)
+
+	-- Studio-only demo hook; the server ignores it in live games
+	DebugOffline = "RemoteEvent", -- client -> server: seconds to replay as offline time
 }
 
 local FOLDER_NAME = "Remotes"

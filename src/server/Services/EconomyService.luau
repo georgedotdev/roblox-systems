@@ -227,24 +227,33 @@ end
 -- replay offline earnings as if the player had been away that long:
 --   game.Players:GetPlayers()[1]:SetAttribute("DebugOfflineSeconds", 3600)
 -- The attribute is cleared after each use, so the same line can run again.
+local function replayOffline(player: Player, seconds: number)
+	local data = DataService.getData(player)
+	if data == nil then
+		return
+	end
+	if currentRate(data) <= 0 then
+		-- Offline earnings are a share of income; with no income there is nothing to pay.
+		notify(player, "NoOfflineIncome", {})
+		return
+	end
+	data.LastOnline = os.time() - seconds
+	onProfileLoaded(player, data)
+end
+
+local validateDebugSeconds = Guard.integer(60, 24 * 3600)
+
 local function attachDebugHook(player: Player)
 	if not RunService:IsStudio() then
 		return
 	end
 	player:GetAttributeChangedSignal("DebugOfflineSeconds"):Connect(function()
 		local seconds = player:GetAttribute("DebugOfflineSeconds")
-		local data = DataService.getData(player)
-		if type(seconds) ~= "number" or seconds <= 0 or data == nil then
+		if type(seconds) ~= "number" or seconds <= 0 then
 			return
 		end
 		player:SetAttribute("DebugOfflineSeconds", nil)
-		if currentRate(data) <= 0 then
-			-- Offline earnings are a share of income; with no income there is nothing to pay.
-			notify(player, "NoOfflineIncome", {})
-			return
-		end
-		data.LastOnline = os.time() - seconds
-		onProfileLoaded(player, data)
+		replayOffline(player, seconds)
 	end)
 end
 
@@ -266,6 +275,14 @@ function EconomyService.Start()
 	Players.PlayerRemoving:Connect(function(player)
 		lastTick[player] = nil
 	end)
+	-- Studio-only demo keys (O / P in EconomyController). Never active in live servers.
+	if RunService:IsStudio() then
+		Remotes.get("DebugOffline").OnServerEvent:Connect(function(player, seconds)
+			if validateDebugSeconds(seconds) then
+				replayOffline(player, seconds)
+			end
+		end)
+	end
 	Players.PlayerAdded:Connect(attachDebugHook)
 	for _, player in Players:GetPlayers() do
 		attachDebugHook(player)
