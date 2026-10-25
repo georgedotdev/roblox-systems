@@ -19,7 +19,16 @@ jobs:
         run: stylua --check src tests
 
       - name: Lint (selene)
-        run: selene src tests
+        shell: bash
+        run: |
+          set -o pipefail
+          # Print each finding as a GitHub annotation, so it shows inline on the diff.
+          selene --display-style=quiet src tests 2>&1 | tee selene.txt || status=$?
+          sed -nE 's/^([^:]+):([0-9]+):([0-9]+): (error|warning)(.*)$/::\4 file=\1,line=\2,col=\3::\4\5/p' selene.txt
+          if [ -n "${status:-}" ] && ! grep -qE '^[^:]+:[0-9]+:[0-9]+: ' selene.txt; then
+            echo "::error title=selene::$(head -c 600 selene.txt | tr '\n' ' ')"
+          fi
+          exit ${status:-0}
 
       - name: Unit tests (Lune)
         run: lune run tests/run
