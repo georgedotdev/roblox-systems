@@ -72,6 +72,8 @@ data and every migration step would be skipped.
 
 ### Economy: server-owned cash
 
+![Buying generators and buying max in the idle economy panel](docs/media/economy.gif)
+
 - Income ticks on the server once per second. The client interpolates the counter for display only.
 - Price of `n` units is a geometric series. "Buy max" inverts it in O(1), then corrects float error,
   so the result is always affordable (tested).
