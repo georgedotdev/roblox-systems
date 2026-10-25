@@ -311,14 +311,14 @@ local function build()
 		})
 		local owned = label(row, {
 			Position = UDim2.fromOffset(12, 31),
-			Size = UDim2.new(0, 90, 0, 14),
+			Size = UDim2.fromOffset(90, 14),
 			Text = "0 owned",
 			TextSize = 12,
 			TextColor3 = MUTED,
 		})
 		local rate = label(row, {
 			Position = UDim2.fromOffset(104, 31),
-			Size = UDim2.new(0, 90, 0, 14),
+			Size = UDim2.fromOffset(90, 14),
 			Text = "+0/s",
 			TextSize = 12,
 			TextColor3 = ACCENT,
@@ -335,7 +335,7 @@ local function build()
 		buyPadding.PaddingTop = UDim.new(0, 5)
 		buyPadding.Parent = buy
 		local price = label(buy, {
-			Position = UDim2.new(0, 0, 0, 16),
+			Position = UDim2.fromOffset(0, 16),
 			Size = UDim2.new(1, 0, 0, 14),
 			Text = "",
 			TextSize = 12,
