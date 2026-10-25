@@ -1,0 +1,9 @@
+[package]
+name = "georgedotdev/roblox-systems"
+version = "1.0.0"
+registry = "https://github.com/UpliftGames/wally-index"
+realm = "shared"
+license = "MIT"
+
+[server-dependencies]
+ProfileStore = "lm-loleris/profilestore@1.0.3"

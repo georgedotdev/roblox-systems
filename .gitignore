@@ -1,0 +1,10 @@
+/Packages
+/ServerPackages
+/DevPackages
+*.rbxl
+*.rbxlx
+*.rbxl.lock
+*.rbxlx.lock
+sourcemap.json
+roblox.d.luau
+.DS_Store

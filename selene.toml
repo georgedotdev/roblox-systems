@@ -1,0 +1,5 @@
+std = "roblox"
+
+[rules]
+# Luau string interpolation and generics are fine; keep the useful checks strict.
+shadowing = "allow"
